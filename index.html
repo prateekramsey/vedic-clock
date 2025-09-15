@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Vedic Clock - Faridabad</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: radial-gradient(circle at center, #0a0f24, #000);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .clock {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #1e2a47, #0b1224);
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.2),
+                  0 15px 25px rgba(0,0,0,0.8),
+                  0 0 30px rgba(0,150,255,0.4);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hand {
+      width: 50%;
+      height: 4px;
+      background: linear-gradient(to right, #00f2ff, #0072ff);
+      position: absolute;
+      top: 50%;
+      transform-origin: 100%;
+      transform: rotate(90deg);
+      border-radius: 4px;
+      box-shadow: 0 0 10px #00f2ff;
+    }
+
+    .hand.hour { height: 6px; width: 35%; background: linear-gradient(to right, #ff9d00, #ff3c00); box-shadow: 0 0 15px #ff5a00; }
+    .hand.minute { height: 4px; width: 45%; background: linear-gradient(to right, #00ff9d, #00ffa3); box-shadow: 0 0 15px #00ffcc; }
+    .hand.second { height: 2px; width: 50%; background: #ff004c; box-shadow: 0 0 15px #ff004c; }
+
+    .center {
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      z-index: 10;
+      box-shadow: 0 0 15px white;
+    }
+
+    .digital {
+      margin-top: 20px;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+
+    .vedic {
+      margin-top: 10px;
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock">
+    <div class="hand hour" id="hour"></div>
+    <div class="hand minute" id="minute"></div>
+    <div class="hand second" id="second"></div>
+    <div class="center"></div>
+  </div>
+
+  <div class="digital" id="digitalTime"></div>
+  <div class="vedic" id="vedicTime"></div>
+
+  <script>
+    function updateClock() {
+      let now = new Date();
+
+      // Get IST (Faridabad) time
+      let options = { timeZone: "Asia/Kolkata" };
+      let istString = now.toLocaleString("en-US", options);
+      let istDate = new Date(istString);
+
+      let hours = istDate.getHours();
+      let minutes = istDate.getMinutes();
+      let seconds = istDate.getSeconds();
+
+      // Rotate hands
+      document.getElementById("hour").style.transform = `rotate(${(hours % 12) * 30 + minutes / 2}deg)`;
+      document.getElementById("minute").style.transform = `rotate(${minutes * 6}deg)`;
+      document.getElementById("second").style.transform = `rotate(${seconds * 6}deg)`;
+
+      // Digital clock
+      let digital = istDate.toLocaleTimeString("en-IN", { hour12: true });
+      let date = istDate.toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      document.getElementById("digitalTime").innerText = digital + " | " + date;
+
+      // Vedic Time (Ghati system: 1 day = 60 ghatis = 24h)
+      let totalMinutes = hours * 60 + minutes + seconds/60;
+      let ghatis = Math.floor(totalMinutes / 24);
+      let vighatis = Math.floor((totalMinutes % 24) * 60 / 24);
+
+      document.getElementById("vedicTime").innerText = `Vedic Time → ${ghatis} Ghati : ${vighatis} Vighati`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
